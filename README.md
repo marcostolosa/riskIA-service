@@ -1,6 +1,6 @@
 # AI Risk Analysis Service
 
-O **AI Risk Analysis Service** é uma API desenvolvida em **FastAPI** que utiliza **Machine Learning** para analisar e classificar o risco de aplicações digitais. O serviço recebe informações sobre a aplicação, avalia sua segurança e fornece uma classificação baseada em critérios pré-definidos de **AppSec (Application Security)**. O modelo de decisão utiliza um **DecisionTreeClassifier** para determinar se a aplicação deve ser aprovada e qual seu nível de risco (baixo, médio ou alto).
+O **AI Risk Analysis Service** é uma API desenvolvida em **FastAPI** que utiliza **Machine Learning** para analisar e classificar o risco de aplicações digitais. O serviço recebe informações sobre a aplicação, avalia sua segurança e fornece uma classificação baseada em critérios pré-definidos de **AppSec (Application Security)**. O modelo de decisão utiliza um **RandomForestClassifier** para determinar se a aplicação deve ser aprovada e qual seu nível de risco (baixo, médio ou alto).
 
 ## 📌 Tecnologias Utilizadas
 - **Python**
@@ -28,12 +28,25 @@ source venv/bin/activate  # No Windows, use `venv\Scripts\activate`
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Executar o servidor
+### 4️⃣ Executar a API
 ```bash
 uvicorn main:app --reload
 ```
 
-A API estará disponível em `http://127.0.0.1:8000`.
+## 📚 Modelo de Machine Learning
+Utilizamos um modelo RandomForestClassifier com as seguintes configurações:
+
+- **n_estimators=500**: número de árvores no modelo.
+- **max_depth=10**: controla a complexidade das árvores para evitar overfitting.
+- **min_samples_split=5**: número mínimo de amostras para dividir um nó.
+- **min_samples_leaf=2**: número mínimo de amostras nas folhas finais.
+- **class_weight="balanced"**: ajusta automaticamente o peso das classes.
+- **random_state=42**: garante reprodutibilidade.
+
+O modelo é treinado automaticamente no início da API e salvo em arquivo usando `joblib`.
+
+## 📈 Precisão e Explicabilidade do Modelo
+A utilização do **Random Forest** aumenta a precisão e a robustez contra overfitting. Além disso, permite analisar a importância das variáveis para melhor explicabilidade.
 
 ## 📚 Endpoints
 
@@ -71,72 +84,14 @@ Este endpoint recebe informações sobre uma aplicação e retorna uma análise 
 }
 ```
 
-## 📊 Treinamento do Modelo
-O modelo é treinado automaticamente ao iniciar a API. Ele utiliza um dataset localizado em `data/training_data.csv`, que deve conter as seguintes colunas:
-
-- **Tipo de Aplicação**: Web, Mobile ou API
-- **Exposição Pública**: Sim/Não
-- **Dados Sensíveis?**: Sim/Não
-- **Histórico de Incidentes?**: Sim/Não
-- **Resultado do Scan SAST (alto risco)?**: Sim/Não
-- **Resultado do Scan DAST (alto risco)?**: Sim/Não
-- **Aplicação com MFA?**: Sim/Não
-- **Aprovado_AppSec**: Sim/Não (Variável alvo do modelo)
-
-### 🔹 Processo de Treinamento
-1. **Carregamento e Pré-processamento dos Dados**:
-   - O dataset é carregado e tratado com a biblioteca `pandas`.
-   - As colunas categóricas que possuem valores `Sim/Não` são convertidas para valores numéricos (1 para "Sim", 0 para "Não").
-   - A coluna `Tipo de Aplicação` é transformada em variáveis dummies (`TipoApp_Web`, `TipoApp_Mobile`, `TipoApp_API`).
-2. **Separação de Features e Variável Alvo**:
-   - A variável `Aprovado_AppSec` é separada como **target (y)**.
-   - As demais colunas são utilizadas como **features (X)**.
-3. **Treinamento do Modelo**:
-   - Utiliza-se um **DecisionTreeClassifier** com `max_depth=4` para encontrar padrões e evitar overfitting.
-   - O modelo treinado fica armazenado em memória para futuras previsões.
-
-### 🔹 Armazenamento e Uso do Modelo Treinado
-- O modelo treinado é armazenado **em memória** durante a execução do serviço, o que significa que ele não é salvo em disco.
-- Sempre que a API é reiniciada, o modelo precisa ser treinado novamente a partir dos dados do arquivo CSV (`data/training_data.csv`).
-- Caso seja necessário persistir o modelo para evitar retrainings frequentes, recomenda-se utilizar bibliotecas como `joblib` ou `pickle` para salvar e carregar o modelo de forma eficiente.
-- Exemplo de salvamento e carregamento do modelo:
-
-```python
-import joblib
-
-# Para salvar o modelo
-joblib.dump(model, "model.pkl")
-
-# Para carregar o modelo
-model = joblib.load("model.pkl")
-```
-
-Caso o dataset de treinamento não esteja presente ou o modelo não seja carregado corretamente, a API retornará um erro e não será capaz de realizar previsões.
-
 ## 🧪 Testes Automatizados
-Para garantir a funcionalidade correta da API, utilizamos **pytest** para testes automatizados.
-
-### 🔹 Instalação do pytest
-```bash
-pip install pytest
-```
+Utilizamos **pytest** para testes automatizados.
 
 ### 🔹 Executando os testes
-Para rodar os testes, basta executar o seguinte comando na raiz do projeto:
 ```bash
+pip install pytest
 pytest
 ```
-
-### 🔹 Estrutura dos Testes
-Os testes incluem:
-1. **Testes de status da API**
-   - Verifica se o endpoint `/` está respondendo corretamente.
-2. **Testes de predição**
-   - Verifica se o endpoint `/predict` retorna uma resposta válida com dados corretos.
-   - Testa se a API lida corretamente com entradas inválidas.
-
-## 📈 Precisão e Explicabilidade do Modelo
-O uso de uma **Árvore de Decisão** facilita a interpretação dos resultados, pois permite visualizar os critérios que levaram a uma determinada classificação de risco. O modelo pode ser ajustado conforme necessário para aumentar a precisão e otimização.
 
 ## 🛠 Como Contribuir
 1. Faça um fork do projeto
@@ -147,3 +102,4 @@ O uso de uma **Árvore de Decisão** facilita a interpretação dos resultados, 
 
 ## 📄 Licença
 Este projeto está sob a licença MIT. Sinta-se à vontade para usá-lo e modificá-lo conforme necessário!
+

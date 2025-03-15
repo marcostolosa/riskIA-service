@@ -21,3 +21,4 @@ riskIA/
 
 # Outros
 *.log
+data/risk_model.pkl

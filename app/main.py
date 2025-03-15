@@ -1,28 +1,30 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
-from .schemas import RiskInput, RiskOutput
-from .model import RiskModel
+from contextlib import asynccontextmanager
+from pydantic import BaseModel
+import joblib
+import os
+from app.model import RiskModel
+
+risk_model = RiskModel()
+MODEL_PATH = "data/risk_model.pkl"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Evento de inicialização assíncrono para carregar o modelo.
-    """
-    try:
+    if os.path.exists(MODEL_PATH):
+        risk_model.load_model(MODEL_PATH)
+        print("✅ Modelo carregado com sucesso!")
+    else:
         risk_model.train_model("data/training_data.csv")
-        print("Modelo treinado/carregado com sucesso!")
-    except Exception as e:
-        print(f"Erro ao treinar/carregar o modelo: {e}")
+        risk_model.save_model(MODEL_PATH)
+        print("✅ Modelo treinado e salvo com sucesso!")
     yield
 
 app = FastAPI(
     title="AI Risk Analysis Service",
     description="Serviço de análise de risco baseado em IA (AppSec).",
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan
 )
-
-risk_model = RiskModel()
 
 @app.get("/")
 def root():
@@ -30,14 +32,10 @@ def root():
 
 @app.post("/predict", response_model=RiskOutput)
 def predict_risk(input_data: RiskInput):
-    """
-    Recebe dados de risco e retorna se a aplicação deve ou não ser aprovada
-    e qual o nível de risco (baixo, médio, alto).
-    """
     try:
         aprovado, risco = risk_model.predict(input_data.model_dump())
         return RiskOutput(aprovado_appsec=aprovado, risco=risco)
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+        raise HTTPException(status_code=400, detail=f"Erro no modelo: {ve}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Erro interno do servidor: {e}")
