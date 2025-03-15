@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
 from .schemas import RiskInput, RiskOutput
 from .model import RiskModel
 
@@ -10,17 +11,16 @@ app = FastAPI(
 
 risk_model = RiskModel()
 
-@app.on_event("startup")
-def startup_event():
-    """
-    Quando a aplicação inicia, treinamos o modelo.
-    Substitua "data/training_data.csv" pelo caminho real do seu dataset.
-    """
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     try:
         risk_model.train_model("data/training_data.csv")
         print("Modelo treinado/carregado com sucesso!")
     except Exception as e:
         print(f"Erro ao treinar/carregar o modelo: {e}")
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def root():
@@ -33,7 +33,7 @@ def predict_risk(input_data: RiskInput):
     e qual o nível de risco (baixo, medio, alto).
     """
     try:
-        aprovado, risco = risk_model.predict(input_data.dict())
+        aprovado, risco = risk_model.predict(input_data.model_dump())
         return RiskOutput(aprovado_appsec=aprovado, risco=risco)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app
+from app.main import app, risk_model
 
 client = TestClient(app)
 
@@ -8,6 +8,13 @@ def test_root():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "AI Risk Analysis Service is running!"}
+
+def test_train_model():
+    """ Garante que o modelo seja treinado antes dos testes de predição. """
+    try:
+        risk_model.train_model("data/training_data.csv")
+    except Exception as e:
+        pytest.fail(f"Erro ao treinar o modelo: {e}")
 
 def test_predict_risk_valid():
     test_data = {
@@ -27,4 +34,4 @@ def test_predict_risk_valid():
 def test_predict_risk_invalid():
     invalid_data = {"tipo_aplicacao": "Desktop"}  # Faltando vários campos obrigatórios
     response = client.post("/predict", json=invalid_data)
-    assert response.status_code == 400  # Deve retornar um erro de validação
+    assert response.status_code == 422  # FastAPI retorna 422 para erros de validação Pydantic
