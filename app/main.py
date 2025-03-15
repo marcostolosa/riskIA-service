@@ -1,18 +1,13 @@
-from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException
 from .schemas import RiskInput, RiskOutput
 from .model import RiskModel
 
-app = FastAPI(
-    title="AI Risk Analysis Service",
-    description="Serviço de análise de risco baseado em IA (AppSec).",
-    version="1.0.0"
-)
-
-risk_model = RiskModel()
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Evento de inicialização assíncrono para carregar o modelo.
+    """
     try:
         risk_model.train_model("data/training_data.csv")
         print("Modelo treinado/carregado com sucesso!")
@@ -20,7 +15,14 @@ async def lifespan(app: FastAPI):
         print(f"Erro ao treinar/carregar o modelo: {e}")
     yield
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="AI Risk Analysis Service",
+    description="Serviço de análise de risco baseado em IA (AppSec).",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+risk_model = RiskModel()
 
 @app.get("/")
 def root():
@@ -30,7 +32,7 @@ def root():
 def predict_risk(input_data: RiskInput):
     """
     Recebe dados de risco e retorna se a aplicação deve ou não ser aprovada
-    e qual o nível de risco (baixo, medio, alto).
+    e qual o nível de risco (baixo, médio, alto).
     """
     try:
         aprovado, risco = risk_model.predict(input_data.model_dump())
