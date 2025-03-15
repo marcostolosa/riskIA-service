@@ -113,6 +113,28 @@ model = joblib.load("model.pkl")
 
 Caso o dataset de treinamento não esteja presente ou o modelo não seja carregado corretamente, a API retornará um erro e não será capaz de realizar previsões.
 
+## 🧪 Testes Automatizados
+Para garantir a funcionalidade correta da API, utilizamos **pytest** para testes automatizados.
+
+### 🔹 Instalação do pytest
+```bash
+pip install pytest
+```
+
+### 🔹 Executando os testes
+Para rodar os testes, basta executar o seguinte comando na raiz do projeto:
+```bash
+pytest
+```
+
+### 🔹 Estrutura dos Testes
+Os testes incluem:
+1. **Testes de status da API**
+   - Verifica se o endpoint `/` está respondendo corretamente.
+2. **Testes de predição**
+   - Verifica se o endpoint `/predict` retorna uma resposta válida com dados corretos.
+   - Testa se a API lida corretamente com entradas inválidas.
+
 ## 📈 Precisão e Explicabilidade do Modelo
 O uso de uma **Árvore de Decisão** facilita a interpretação dos resultados, pois permite visualizar os critérios que levaram a uma determinada classificação de risco. O modelo pode ser ajustado conforme necessário para aumentar a precisão e otimização.
 
@@ -125,4 +147,3 @@ O uso de uma **Árvore de Decisão** facilita a interpretação dos resultados, 
 
 ## 📄 Licença
 Este projeto está sob a licença MIT. Sinta-se à vontade para usá-lo e modificá-lo conforme necessário!
-
