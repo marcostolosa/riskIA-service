@@ -13,8 +13,8 @@ O **AI Risk Analysis Service** é uma API desenvolvida em **FastAPI** que utiliz
 
 ### 1️⃣ Clonar o repositório
 ```bash
-git clone https://github.com/seu_usuario/seu_repositorio.git
-cd seu_repositorio
+git clone https://github.com/marcostolosa/riskIA-service.git
+cd riskIA-service/
 ```
 
 ### 2️⃣ Criar um ambiente virtual e ativá-lo
