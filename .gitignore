@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.swp
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Virtual Envs
+venv/
+.env
+riskIA/
+
+# Jupyter Notebooks Checkpoints
+.ipynb_checkpoints/
+
+# Outros
+*.log
+data/training_data.csv

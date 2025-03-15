@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+scikit-learn
+pandas
+# Se quiser integrar direto com Google Sheets:
+#gspread
+#oauth2client
