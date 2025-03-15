@@ -1,0 +1,9 @@
+Tipo de Aplicação,Exposição Pública,Dados Sensíveis?,Histórico de Incidentes?,Resultado do Scan SAST (alto risco)?,Resultado do Scan DAST (alto risco)?,Aplicação com MFA?,Aprovado_AppSec
+Web,Sim,Sim,Não,Não,Sim,Sim,Sim
+Web,Sim,Sim,Sim,Sim,Sim,Não,Sim
+Mobile,Não,Não,Não,Sim,Não,Não,Sim
+API,Sim,Não,Sim,Não,Sim,Sim,Não
+API,Não,Sim,Não,Não,Não,Sim,Sim
+Web,Sim,Sim,Não,Sim,Sim,Sim,Não
+Mobile,Não,Não,Não,Não,Não,Não,Sim
+API,Sim,Sim,Sim,Sim,Sim,Sim,Não
