@@ -95,7 +95,23 @@ O modelo é treinado automaticamente ao iniciar a API. Ele utiliza um dataset lo
    - Utiliza-se um **DecisionTreeClassifier** com `max_depth=4` para encontrar padrões e evitar overfitting.
    - O modelo treinado fica armazenado em memória para futuras previsões.
 
-Caso o dataset de treinamento não esteja presente ou o modelo não seja carregado corretamente, a API retornará um erro.
+### 🔹 Armazenamento e Uso do Modelo Treinado
+- O modelo treinado é armazenado **em memória** durante a execução do serviço, o que significa que ele não é salvo em disco.
+- Sempre que a API é reiniciada, o modelo precisa ser treinado novamente a partir dos dados do arquivo CSV (`data/training_data.csv`).
+- Caso seja necessário persistir o modelo para evitar retrainings frequentes, recomenda-se utilizar bibliotecas como `joblib` ou `pickle` para salvar e carregar o modelo de forma eficiente.
+- Exemplo de salvamento e carregamento do modelo:
+
+```python
+import joblib
+
+# Para salvar o modelo
+joblib.dump(model, "model.pkl")
+
+# Para carregar o modelo
+model = joblib.load("model.pkl")
+```
+
+Caso o dataset de treinamento não esteja presente ou o modelo não seja carregado corretamente, a API retornará um erro e não será capaz de realizar previsões.
 
 ## 📈 Precisão e Explicabilidade do Modelo
 O uso de uma **Árvore de Decisão** facilita a interpretação dos resultados, pois permite visualizar os critérios que levaram a uma determinada classificação de risco. O modelo pode ser ajustado conforme necessário para aumentar a precisão e otimização.
